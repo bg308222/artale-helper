@@ -1,7 +1,12 @@
 import axios from "axios";
 import type { ScrollTransactionResponse } from "./type";
 
-const SESSION_TOKEN = Bun.env.SESSION_TOKEN ?? "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoiM3hkMlFUd3BlQWg5Wk53SUdrM091RzhFZTNPUDlyZ3pwOHBac3ZBZnExVG5aRlpuNDNvTEJJRjB5Wk8xMTU1eWZxVExxNzFYMU5Qbnd3dmRPekNiUXcifQ..bthaWgZd9Apy_l9_Sttrog.v4CZKPurw2R_5Dd6-3P43mMAHF2Tr7yPyUzyrKnR-whsFBzs3srV-oCHptl_AdGRUFUp3DiMhUKle-g9FXh4WKKoHsMYzpPZnCRqXpNbm2l-9GcJoZNCdWpk3ZJsd3MkC0cd6RyIi-b9HI54T2qUELppFXFUh3LsJkgBvAHYiVrYqtvMtzIe_SmdYd3GMm_8cnZ65RkGBk03hjqcxEOlJ6SMvLkb6MEVDzAorZrpF3sazQfwcXkwPYTv1JV-uMNOz--PSnPKTeOjmHhsrslzHqVO_PkDlK5k2-_4sYD8pICbPNBA9PzahnmutnhUlNWjOsuCS6Q7aCSX5i_9dlbk4AtZtKs_vy-oVs0s56QXJO9Y94uo6r3zJGNbIU7s9qI9JDCRuckRWCH6OAZBeNpZ2MYwJvGFxeVVzeYjqbCpvT-zUN2_hu9F64UFZAJoXVxFMDMXN5_AqCgLKa_s5Ft5lA.FtHTlIlFcOG8_JDcmNlQn8vUuGVf8hBLcdtObk63aoI"
+const SESSION_TOKEN = Bun.env.SESSION_TOKEN ?? ""
+if (!SESSION_TOKEN) {
+  console.error("SESSION_TOKEN is not set. Please set it in the environment variables.");
+  process.exit(1);
+}
+
 const CURRENCY_MAPPING: Record<string, string> = {
   "meso": "楓幣",
   "snow": "雪花",
@@ -23,10 +28,24 @@ const server = Bun.serve({
           updateOn: v.updated_at
         }
       })
-      return Response.json(finalResult);
+      return Response.json(finalResult, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",              // 允許所有來源
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "*",              // 允許所有 headers
+        }
+      });
     },
-    "/test": () => {
+    "/public/test": () => {
       return new Response(Bun.file("./public/index.html"));
+    },
+    "/public/plugin": async () => {
+      const jsText = await Bun.file("./public/plugin.js").text();
+      return new Response(jsText, {
+        headers: {
+          "Content-Type": "application/javascript",
+        }
+      });
     }
   },
 });
