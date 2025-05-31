@@ -18,8 +18,9 @@ const server = Bun.serve({
     "/query": async (req, res) => {
       const url = new URL(req.url);
       const itemName = url.searchParams.get("itemName") ?? "";
+      const type = url.searchParams.get("type") ?? "";
 
-      const { results } = await query(itemName);
+      const { results } = await query(itemName, type);
       const finalResult = results.map(v => {
         return {
           itemName: v.item_name,
@@ -53,12 +54,12 @@ const server = Bun.serve({
 
 console.log(`Listening on localhost:${server.port}`);
 
-async function query(itemName: string) {
+async function query(itemName: string, type: string) {
   return axios.get("https://artale-market.org/api/transactions", {
     params: {
       isActive: true,
       itemName: itemName,
-      transactionType: "sell",
+      transactionType: type,
       page: 1,
       limit: 10,
       sortKey: "updated_at",
