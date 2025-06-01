@@ -1,7 +1,46 @@
+# artale helper
+
+## Dev
+1. install dependencies
+```
+bun install
+```
+
+2. run dev
+```
+bun dev
+```
+
 ## Docker
-docker run -d -p 3000:3000 -e SESSION_TOKEN=eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoiM3hkMlFUd3BlQWg5Wk53SUdrM091RzhFZTNPUDlyZ3pwOHBac3ZBZnExVG5aRlpuNDNvTEJJRjB5Wk8xMTU1eWZxVExxNzFYMU5Qbnd3dmRPekNiUXcifQ..3DOpoSA6QogovfM1c_yUVg.W43nmeg69X8BLurXtG8BlEjcfw1bqPyGdLopaQi65bPo1D0GUyYomOBZ-hj8VQQcEW0dk34lgr9v0Ozu9isaUGmYcOxY8HfMNbRVAJDZk5iNjsnmNMtNvUo8FlNmTRth3OxlCNHXKa8a8YJywgiW-lWJor9e1bD31RjZqcY-KUB-e1ZF6ku2rXUHNztMLcmGPq8Uch9OnZ9ME5rr7Yp9PJ4LeR7ez8GdXvJ9cUlhrjn0JpLNLpJ2FO17yUAHlj_E4xaV8FtFgMWVkt-AWPD9Hyfq26RMCEpObPEBTz1q2xKe7f633pRnAeFkXM2bWk_w-JJRdmKv1t0Fr6m71gg5MMiZgWchhmg7G0C9kAhongeeOkJ0Zqp9U0mAYjQeUl5WDoNgYRC_J_Fl3CR8p7K38L0Gg7zYi6bxCUiCYqbQNQk5rh47RQLKUQ023GG6NKI2CzNbflyCFDxfk2juFzxhrA.bFFcTzKVGoW5fKRP8rEWn_m3Vz6QPwX4lAQesIBoX9Q artale-price-query:1.0.1
+### Build image
+```
+just build-image {{version}}
+```
+
+### Run container
+```
+docker rm -f artale-helper
+docker rmi -f bg308222/artale-helper:latest
+docker run -d --name artale-helper -p 3000:3000 -e SESSION_TOKEN=<your credential> bg308222/artale-helper:latest
+```
 
 ## Plugin
-const script = document.createElement("script");
-script.src = "http://localhost:3000/public/plugin";
-document.body.appendChild(script);
+### [artale drop](https://a2983456456.github.io/artale-drop/) plugin
+1. Install tampermonkey on you browser
+2. Add new userscript
+```
+// ==UserScript==
+// @name         artale-helper
+// @author       bg308222
+// @match        https://a2983456456.github.io/artale-drop/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=github.io
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+    const script = document.createElement("script");
+    script.src = "http://localhost:3000/public/plugin";
+    document.body.appendChild(script);
+})();
+```

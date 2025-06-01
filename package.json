@@ -1,5 +1,5 @@
 {
-  "name": "artale-price-query",
+  "name": "artale-helper",
   "module": "index.ts",
   "type": "module",
   "private": true,

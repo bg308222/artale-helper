@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "artale-price-query",
+      "name": "artale-helper",
       "dependencies": {
         "axios": "^1.9.0",
       },

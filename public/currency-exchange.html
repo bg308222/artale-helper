@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>貨幣轉換器</title>
+    <style>
+        body {
+            font-family: 'Helvetica', sans-serif;
+            background: #f4f4f8;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .section {
+            background: white;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .section h2 {
+            margin-top: 0;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+        }
+
+        .input-group label {
+            width: 60px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .note {
+            font-size: 0.8rem;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>貨幣轉換器</h1>
+
+    <div class="section">
+        <h2>設定比例 (台幣:雪花:楓幣)</h2>
+        <div class="input-group">
+            <label for="ratioTWD">台幣</label>
+            <input type="number" id="ratioTWD" min="0" value="45" />
+        </div>
+        <div class="input-group">
+            <label for="ratioSnow">雪花</label>
+            <input type="number" id="ratioSnow" min="0" value="11" />
+        </div>
+        <div class="input-group">
+            <label for="ratioMaple">楓幣</label>
+            <input type="number" id="ratioMaple" min="0" value="605000" />
+        </div>
+        <div class="note">比率會自動儲存在瀏覽器中</div>
+    </div>
+
+    <div class="section">
+        <h2>金額換算</h2>
+        <div class="input-group">
+            <label for="valTWD">台幣</label>
+            <input type="number" id="valTWD" min="0" />
+        </div>
+        <div class="input-group">
+            <label for="valSnow">雪花</label>
+            <input type="number" id="valSnow" min="0" />
+        </div>
+        <div class="input-group">
+            <label for="valMaple">楓幣</label>
+            <input type="number" id="valMaple" min="0" />
+        </div>
+    </div>
+
+    <script>
+        const ratioInputs = {
+            TWD: document.getElementById('ratioTWD'),
+            Snow: document.getElementById('ratioSnow'),
+            Maple: document.getElementById('ratioMaple')
+        };
+
+        const valueInputs = {
+            TWD: document.getElementById('valTWD'),
+            Snow: document.getElementById('valSnow'),
+            Maple: document.getElementById('valMaple')
+        };
+
+        function loadRatios() {
+            const stored = localStorage.getItem('ratios');
+            if (stored) {
+                const ratios = JSON.parse(stored);
+                ratioInputs.TWD.value = ratios.TWD;
+                ratioInputs.Snow.value = ratios.Snow;
+                ratioInputs.Maple.value = ratios.Maple;
+            }
+        }
+
+        function saveRatios() {
+            const ratios = {
+                TWD: parseFloat(ratioInputs.TWD.value) || 1,
+                Snow: parseFloat(ratioInputs.Snow.value) || 1,
+                Maple: parseFloat(ratioInputs.Maple.value) || 1,
+            };
+            localStorage.setItem('ratios', JSON.stringify(ratios));
+        }
+
+        function getRatios() {
+            return {
+                TWD: parseFloat(ratioInputs.TWD.value) || 1,
+                Snow: parseFloat(ratioInputs.Snow.value) || 1,
+                Maple: parseFloat(ratioInputs.Maple.value) || 1,
+            };
+        }
+
+        function updateFrom(source) {
+            const r = getRatios();
+            let base = 0;
+
+            switch (source) {
+                case 'TWD':
+                    base = parseFloat(valueInputs.TWD.value) || 0;
+                    valueInputs.Snow.value = (base * r.Snow / r.TWD).toFixed(2);
+                    valueInputs.Maple.value = (base * r.Maple / r.TWD).toFixed(2);
+                    break;
+                case 'Snow':
+                    base = parseFloat(valueInputs.Snow.value) || 0;
+                    valueInputs.TWD.value = (base * r.TWD / r.Snow).toFixed(2);
+                    valueInputs.Maple.value = (base * r.Maple / r.Snow).toFixed(2);
+                    break;
+                case 'Maple':
+                    base = parseFloat(valueInputs.Maple.value) || 0;
+                    valueInputs.TWD.value = (base * r.TWD / r.Maple).toFixed(2);
+                    valueInputs.Snow.value = (base * r.Snow / r.Maple).toFixed(2);
+                    break;
+            }
+        }
+
+        // Event listeners
+        for (const key in ratioInputs) {
+            ratioInputs[key].addEventListener('input', saveRatios);
+        }
+
+        for (const key in valueInputs) {
+            valueInputs[key].addEventListener('input', () => updateFrom(key));
+        }
+
+        loadRatios();
+    </script>
+</body>
+
+</html>

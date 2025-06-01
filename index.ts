@@ -15,7 +15,19 @@ const CURRENCY_MAPPING: Record<string, string> = {
 const server = Bun.serve({
   port: 3000,
   routes: {
-    "/query": async (req, res) => {
+    "/query": async (req) => {
+      const corsHeaders = {
+        "Access-Control-Allow-Origin": "https://a2983456456.github.io",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Max-Age": "86400", // 1 day
+      }
+      if (req.method === "OPTIONS") {
+        return new Response(null, {
+          headers: corsHeaders
+        })
+      }
+
       const url = new URL(req.url);
       const itemName = url.searchParams.get("itemName") ?? "";
       const type = url.searchParams.get("type") ?? "";
@@ -30,11 +42,7 @@ const server = Bun.serve({
         }
       })
       return Response.json(finalResult, {
-        headers: {
-          "Access-Control-Allow-Origin": "*",              // 允許所有來源
-          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-          "Access-Control-Allow-Headers": "*",              // 允許所有 headers
-        }
+        headers: corsHeaders
       });
     },
     "/public/test": () => {
@@ -45,6 +53,13 @@ const server = Bun.serve({
       return new Response(jsText, {
         headers: {
           "Content-Type": "application/javascript",
+        }
+      });
+    },
+    "/public/currency-exchange": () => {
+      return new Response(Bun.file("./public/currency-exchange.html"), {
+        headers: {
+          "Content-Type": "text/html",
         }
       });
     }

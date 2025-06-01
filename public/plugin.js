@@ -24,12 +24,15 @@ document.getElementById("drop-container").addEventListener("mousemove", (e) => {
 
         console.log(`Fetching data for: ${itemName}`);
         try {
+            const loadingText = `<strong>${itemName}</strong><br>資料載入中...`;
+            showTooltip(loadingText);
+            const responses = await Promise.all([fetch(`${apiUrl}?itemName=${encodeURIComponent(itemName)}&type=buy`), fetch(`${apiUrl}?itemName=${encodeURIComponent(itemName)}&type=sell`)])
+            const [buyResponse, sellResponse] = responses;
+
             // 目前有人願意買的價格, 排序由高到低
-            const buyResponse = await fetch(`${apiUrl}?itemName=${encodeURIComponent(itemName)}&type=buy`);
             const buyData = (await buyResponse.json()).toSorted((a, b) => b.amount - a.amount);
 
             // 目前有人願意賣的價格, 排序由低到高
-            const sellResponse = await fetch(`${apiUrl}?itemName=${encodeURIComponent(itemName)}&type=sell`);
             const sellData = (await sellResponse.json()).toSorted((a, b) => a.amount - b.amount);
 
             // 組裝買價和賣價的顯示內容
