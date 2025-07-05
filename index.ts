@@ -70,18 +70,18 @@ const server = Bun.serve({
 console.log(`Listening on localhost:${server.port}`);
 
 async function query(itemName: string, type: string) {
-  return axios.get("https://artale-market.org/api/transactions", {
-    params: {
-      isActive: true,
-      itemName: itemName,
-      transactionType: type,
-      page: 1,
-      limit: 10,
-      sortKey: "updated_at",
-      sortDirection: "desc"
-    },
+  const urlSearchParams = new URLSearchParams();
+  urlSearchParams.append("isActive", "true");
+  urlSearchParams.append("itemName", itemName);
+  urlSearchParams.append("transactionType", type);
+  urlSearchParams.append("page", "1");
+  urlSearchParams.append("limit", "10");
+  urlSearchParams.append("sortKey", "updated_at");
+  urlSearchParams.append("sortDirection", "desc");
+
+  return fetch(`https://artale-market.org/api/transactions?${urlSearchParams.toString()}`, {
     headers: {
       cookie: `next-auth.session-token=${SESSION_TOKEN}`
     }
-  }).then(v => v.data as ScrollTransactionResponse)
+  }).then(v => v.json() as Promise<ScrollTransactionResponse>);
 }
